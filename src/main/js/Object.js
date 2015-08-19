@@ -16,6 +16,8 @@
  * В дополнение к вызову конструктора класса <code>Object()</code>, объекты могут создаваться и инициализироваться при
  * помощи синтаксиса объектных литералов.
  *
+ * @class
+ *
  * @param {number|boolean|string|symbol?} value В этом необязательном аргументе указано элементарное
  * JavaScript-значение – число, логическое значение или строка, которое должно быть преобразовано в объект
  * <code>Number</code>, <code>Boolean</code> или <code>String</code>.
@@ -32,8 +34,9 @@
  * @see String
  * @since Standard ECMA-262 1st. Edition
  */
-class Object {
-    constructor(value=undefined) {
+const Object = ((PROTOTYPE, EXTENSIBLE) => {
+
+    function Object(value = undefined) {
 
         if (!(this instanceof Object)) // if Object was called without "new" keyword
             return new Object(value);
@@ -48,6 +51,8 @@ class Object {
             case 'symbol':
                 return value;
         }
+
+        Object.setPrototypeOf(this, this.constructor.prototype);
     }
 
     /**
@@ -84,7 +89,7 @@ class Object {
      *
      * @since Standard ECMA-262 6th. Edition (ECMAScript 2015)
      */
-    static assign(target, ...sources) {
+    Object.assign = (target, ...sources) => {
         if (typeof target === 'undefined' || target === null)
             throw new TypeError('Cannot convert first argument target object');
 
@@ -96,7 +101,7 @@ class Object {
                     Object.defineProperty(target, propertyName, desc);
             }));
         return target;
-    }
+    };
 
     /**
      * Создает объект с указанным прототипом и свойствами. Функция <code>Object.create()</code> создает и возвращает
@@ -136,7 +141,7 @@ class Object {
      * @see Object#getOwnPropertyDescriptor
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static create(prototype, descriptors) {
+    Object.create = (prototype, descriptors) => {
         if (this === Object || typeof this === 'undefined')
             switch (typeof prototype) {
                 case 'object':
@@ -150,7 +155,7 @@ class Object {
         /* Если происходит внутренний вызов функции как конструктора - удаляем ссылку на прототип, что бы не
          * захламлять этим основной код. */
             Object.create.prototype = null;
-    }
+    };
 
     /**
      * Создает или настраивает свойства объекта. Функция <code>Object.defineProperties()</code> создает или настраивает
@@ -187,7 +192,7 @@ class Object {
      *
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static defineProperties(object, descriptors) {
+    Object.defineProperties = (object, descriptors) => {
         switch (typeof object) {
             case 'object':
             case 'function':
@@ -197,7 +202,7 @@ class Object {
                 return object;
         }
         throw new TypeError('Object.defineProperties called on non-object');
-    }
+    };
 
     /**
      * Создаёт или настраивает одно свойство в объекте. Функция <code>Object.defineProperty()</code> создает или
@@ -234,12 +239,10 @@ class Object {
      * @see Object#getOwnPropertyDescriptor
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static defineProperty(object, name, descriptor) {
-
-        /*native code*/
-
+    Object.defineProperty = (object, name, descriptor) => {
+        /* native code */
         return object;
-    }
+    };
 
     /**
      * Делает объект неизменяемым. Функция <code>Object.freeze()</code> делает объект <em>object</em> нерасширяемым
@@ -266,10 +269,10 @@ class Object {
      *
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static freeze(object) {
+    Object.freeze = object => {
         Object.keys(Object.seal(object)).forEach(key => Object.defineProperty(object, key, {writable: false}));
         return object;
-    }
+    };
 
     /**
      * Возвращает атрибуты свойства. Функция <code>Object.getOwnPropertyDescriptor()</code> возвращает дескриптор для
@@ -286,17 +289,15 @@ class Object {
      * @see Object#defineProperty
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static getOwnPropertyDescriptor(object, propertyName) {
-
+    Object.getOwnPropertyDescriptor = (object, propertyName) => {
         /* proxied code*/
-
         return /** @type FieldDescriptor<V> */ {
-            configurable:true,
-            writable:true,
+            configurable: true,
+            writable: true,
             value: object[propertyName],
             enumerable: true
         };
-    }
+    };
 
     /**
      * Возвращает имена неунаследованных свойств. Функция <code>Object.getOwnPropertyNames()</code> возвращает массив с
@@ -313,9 +314,9 @@ class Object {
      * @see Object#keys
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static getOwnPropertyNames(object) {
+    Object.getOwnPropertyNames = object => {
         return Object.keys(object).concat(/*proxied code*/);
-    }
+    };
 
     /**
      * Метод <code>Object.getOwnPropertySymbols()</code> возвращает массив всех символических (symbol) свойств,
@@ -331,7 +332,10 @@ class Object {
      *
      * @since Standard ECMA-262 6th. Edition (ECMAScript 2015)
      */
-    static getOwnPropertySymbols(object) { /* proxied code */ return []; }
+    Object.getOwnPropertySymbols = object => {
+        /* proxied code */
+        return [];
+    };
 
     /**
      * Возвращает прототип объекта. Функция <code>Object.getPrototypeOf()</code> возвращает прототип своего аргумента.
@@ -351,30 +355,9 @@ class Object {
      * @see Function#prototype
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static getPrototypeOf(object) {
-
-        let /** @type * */ prototype = (
-            (('constructor' in object) && ('prototype' in object.constructor)) ? object.constructor : Object
-        ).prototype;
-
-        if (object.hasOwnProperty('constructor')) { // Если проверка осуществляется у прототипа
-            /**
-             * @template V
-             * @type {FieldDescriptor<V>|PropertyDescriptor<V>}
-             */
-            const constructorDescriptor = Object.getOwnPropertyDescriptor(object, 'constructor');
-
-            if (!constructorDescriptor.writable && constructorDescriptor.configurable) // Preparing for delete
-                Object.defineProperty(object, 'constructor', {writable: true});
-
-            if (delete object['constructor']) { // Пытаемся удалить конструктор
-                prototype = Object.getPrototypeOf(object); // Если удалили - считываем прототип
-                Object.defineProperty(object, 'constructor', constructorDescriptor); // Возвращаем конструктор на место.
-            }
-        }
-
-        return prototype;
-    }
+    Object.getPrototypeOf = object => {
+        return this[PROTOTYPE];
+    };
 
     /**
      * Метод <code>Object.is()</code> определяет, являются ли два значения <a
@@ -422,10 +405,10 @@ class Object {
      *
      * @since Standard ECMA-262 6th. Edition
      */
-    static is(value1, value2) {
-            return (value1 === 0 && value2 === 0) ? 1 / value1 === 1 / value2:
-                (value1 !== value1) ? value2 !== value2: value1 === value2;
-    }
+    Object.is = (value1, value2) => {
+        return (value1 === 0 && value2 === 0) ? 1 / value1 === 1 / value2 :
+            (value1 !== value1) ? value2 !== value2 : value1 === value2;
+    };
 
     /**
      * Возможно ли добавить в объект новое свойство? Если в объект можно добавлять новые свойства, он является
@@ -448,16 +431,9 @@ class Object {
      * @see Object#preventExtensions
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static isExtensible(object) {
-        const /** @type string */ TEST_PROPERTY_NAME = '_$_qwertyuiop_$_';
-        try {
-            return (object[TEST_PROPERTY_NAME] = object).hasOwnProperty(TEST_PROPERTY_NAME);
-        } catch (e) {
-            return false;
-        } finally {
-            delete object[TEST_PROPERTY_NAME];
-        }
-    }
+    Object.isExtensible = object => {
+        return object[EXTENSIBLE];
+    };
 
     /**
      * Является ли объект неизменяемым? Объект считается зафиксированным, если все его неунаследованные свойства (кроме
@@ -484,14 +460,10 @@ class Object {
      *
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static isFrozen(object) {
-        // TODO: Переписать единым предикатом в Straem-стиле!
-        if (!Object.isExtensible(object))
-            return false;
-
-        return Object.getOwnPropertyNames(object).every(
+    Object.isFrozen = object => {
+        return Object.isExtensible(object) && Object.getOwnPropertyNames(object).every(
                 propertyName => Object.getOwnPropertyDescriptor(object, propertyName).writable);
-    }
+    };
 
     /**
      * Возможно ли добавлять в объект новые и удалять существующие свойства? Объект считается нерасширяемым, с
@@ -515,10 +487,10 @@ class Object {
      * @see Object#seal
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static isSealed(object) {
+    Object.isSealed = object => {
         return Object.isExtensible(object) && object.getOwnPropertyNames().some(
                     propertyName => Object.getOwnPropertyDescriptor(object, propertyName).configurable);
-    }
+    };
 
     /**
      * Возвращает имена собственных перечислимых свойств. Функция <code>{@link Object#keys}()</code> возвращает массив с
@@ -537,13 +509,13 @@ class Object {
      * @see Object#getOwnPropertyNames
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static keys(object) {
+    Object.keys = object => {
         var /** @type Array<string> */ result = [];
         for (let /** @type string */ propertyName in object)
             if (object.hasOwnProperty(propertyName))
                 result.push(propertyName);
         return result;
-    }
+    };
 
     /**
      * Метод <code>Object.observe()</code> используется для асинхронного обзора изменений в объекте. Он предоставляет
@@ -592,7 +564,9 @@ class Object {
      * @see Array#observe
      * @since Standard ECMA-262 7th. Edition
      */
-    static observe(object, callback) { /* proxied code */ }
+    Object.observe = (object, callback) => {
+        /* proxied code */
+    };
 
     /**
      * Предотвращает добавление в объект новых свойств. Функция <code>{@link Object#preventExtensions}()</code>
@@ -610,7 +584,10 @@ class Object {
      * @see Object#seal
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static preventExtensions(object) { /* proxied code */ return object; }
+    Object.preventExtensions = object => {
+        /* proxied code */
+        return object;
+    };
 
     /**
      * Проверяет, будет ли свойство видимо для цикла <code>for/in</code>. Инструкция <code>for/in</code> выполняет цикл
@@ -638,9 +615,9 @@ class Object {
      * @see Object#hasOwnProperty
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static propertyIsEnumerable(propertyName) {
+    Object.propertyIsEnumerable = propertyName => {
         return Object.getOwnPropertyDescriptor(this, propertyName).enumerable;
-    }
+    };
 
     /**
      * Предотвращает добавление и удаление свойств. Функция <code>Object.seal()</code> делает объект <em>object</em>
@@ -664,7 +641,10 @@ class Object {
      * @see Object#preventExtensions
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    static seal(object) { /* proxied code */ return object; }
+    Object.seal = object => {
+        /* proxied code */
+        return object;
+    };
 
     /**
      * Метод <code>Object.setPrototype()</code> устанавливает прототип (то есть, внутреннее свойство
@@ -694,17 +674,9 @@ class Object {
      * @see Object#__proto__
      * @since Standard ECMA-262 6th. Edition
      */
-    static setPrototypeOf(object, prototype) {
-        const propertyDescriptor = Object.getOwnPropertyDescriptor(object, '__proto__');
-        if ('__proto__' in object)
-            if (propertyDescriptor.writable)
-                object.__proto__ = prototype;
-            else if (propertyDescriptor.configurable)
-                Object.defineProperty(object, '__proto__', { value: prototype });
-            //else
-            //    throw new TypeError ???
-        return object;
-    }
+    Object.setPrototypeOf = (object, prototype) => {
+        object[PROTOTYPE] = prototype;
+    };
 
     /**
      * The <code>Object.unobserve()</code> method is used to remove observers set by
@@ -742,7 +714,9 @@ class Object {
      * @see Array#unobserve
      * @since Standard ECMA-262 7th. Edition
      */
-    static unobserve(object, callback) { /* proxied code*/ }
+    Object.unobserve = (object, callback) => {
+        /* proxied code*/
+    };
 
 
     /**
@@ -766,7 +740,7 @@ class Object {
      * @see Object#propertyIsEnumerable;
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    hasOwnProperty(propertyName) {
+    Object.prototype.hasOwnProperty = propertyName => {
 
         if (!(propertyName in this)) // Если свойства нет в цепочке прототипов
             return false;
@@ -800,7 +774,7 @@ class Object {
         }
 
         return true;
-    }
+    };
 
     /**
      * Проверяет, является ли один объект прототипом другого объекта. JavaScript-объекты наследуют свойства от своих
@@ -830,9 +804,9 @@ class Object {
      * @see Object#constructor
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    isPrototypeOf(object) {
+    Object.prototype.isPrototypeOf = object => {
         return this === Object.getPrototypeOf(object);
-    }
+    };
 
     /**
      * Возвращает локализованное строковое представление объекта. Этот метод предназначен для получения строкового
@@ -851,9 +825,9 @@ class Object {
      * @see Object#toString
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    toLocaleString() {
+    Object.prototype.toLocaleString = () => {
         return this.toString();
-    }
+    };
 
     /**
      * Возвращает строковое представление объекта. Метод <code>toString()</code> относится к тем, которые обычно не
@@ -919,9 +893,9 @@ class Object {
      * @see Object#valueOf
      * @since Standard ECMA-262 1st. Edition
      */
-    toString() {
-        return '[object Object]'; //return '[object ' + this.constructor.name + ']';
-    }
+    Object.prototype.toString = () => {
+        return '[object Object]';
+    };
 
     /**
      * Элементарное значение указанного объекта. Элементарное значение, связанное с объектом, если оно есть. Если с
@@ -967,11 +941,9 @@ class Object {
      * @see Object#toString
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    valueOf() {
+    Object.prototype.valueOf = () => {
         return this;
     }
-}
 
-//Object = new Proxy(Object, {
-//
-// });
+    return Object;
+})(Symbol('prototype'), Symbol('extensible'));

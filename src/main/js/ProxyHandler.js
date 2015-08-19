@@ -283,34 +283,36 @@ class ProxyHandler {
     has(target, propertyName) {}
 
     /**
-     * Метод <code>ProxyHandler.get()</code> является перехватчиком для операции получения значения свойства. Т.е.
-     * данный метод может перехватывать следующие вызовы и операции:
+     * Метод <code>ProxyHandler.get()</code> является перехватчиком для операции получения значения свойства
+     * (<code>[[Get]]</code>). Т.е. данный метод может перехватывать следующие вызовы и операции:
      * <ul>
-     *     <li>Property access: <code>proxy[foo]</code> и <code>proxy.bar</code></li>
-     *     <li>Inherited property access: <code>{@link Object#create}(proxy)[foo]</code></li>
-     *     <li><code>with</code> check: <code>with(proxy) { (foo); }</code></li>
-     *     <li>{@link Reflect#get}()</li>
+     *     <li>Доступ к свойству: <code>proxy[foo]</code> и <code>proxy.bar</code></li>
+     *     <li>Доступ к унаследованному свойству: <code>{@link Object#create}(proxy)[foo]</code></li>
+     *     <li>Проверка <code>with</code>: <code>with(proxy) { (foo); }</code></li>
+     *     <li><code>{@link Reflect#get}()</code></li>
      * </ul>
      *
      * <h2>Инварианты</h2>
      * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
      * <code>{@link Proxy}</code> после выполнения метода возбудит исключение <code>{@link TypeError}</code>:
      * <ul>
-     *     <li>The value reported for a property must be the same as the value of the corresponding target object
-     *     property if the target object property is a non-writable, non-configurable data property.</li>
-     *     <li>The value reported for a property must be undefined if the corresponding target object property is
-     *     non-configurable accessor property that has undefined as its [[Get]] attribute.</li>
+     *     <li>Значение, возвращаемое для свойства, должно быть тем же, что и значение соответствующего поля целевого
+     *     объекта, если свойство целевого объекта содержит данные, являясь незаписываемым (non-writable) и
+     *     неконфигурируемым (non-configurable).</li>
+     *     <li>Значение, возвращаемое для свойства, должно быть <code>undefined</code>, если значение соответствующего
+     *     поля целевого объекта является неконфигурируемым (non-configurable) get/set-свойством, которое возвращает
+     *     <code>undefined</code> в ответ на запрос <code>[[Get]]</code>.</li>
      * </ul>
      *
      * @example
-     * // The following code traps getting a property value.
+     * // Следующий код ловит обращение к значению свойства:
      * const p = new Proxy({}, { get: function(target, prop, receiver) { console.log("called: " + prop); return 10; }});
      * console.log(p.a); // "called: a", 10
      *
-     * // The following code violates an invariant.
+     * // Следующий код нарушает инвариант:
      * const obj = Object.defineProperty({}, "a", { configurable:false, enumerable:false, value:10, writable:false }),
      *     p = new Proxy(obj, { get: function(target, prop) { return 20; }});
-     * p.a; // TypeError is thrown
+     * p.a; // Возбуждается TypeError
      *
      * @param {T} target целевой объект
      * @param {string} propertyName имя свойства, значение которого пытаются получить
@@ -318,12 +320,50 @@ class ProxyHandler {
      *
      * @see Proxy
      * @see Reflect#get
-     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[HasProperty]]':
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Get]]':
      * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-get-p-receiver}
      */
     get(target, propertyName, receiver) {}
 
-    set() {}
+    /**
+     * Метод <code>ProxyHandler.set()</code> отлавливает установку значения свойства (<code>[[Set]]</code>).  Т.е.
+     * данный метод может перехватывать следующие вызовы и операции:
+     * <ul>
+     *     <li>Присвоение значения свойству: <code>proxy[foo] = bar and proxy.foo = bar</code></li>
+     *     <li>Присвоение значения унаследованному свойству: <code>Object.create(proxy)[foo] = bar</code></li>
+     *     <li><code>Reflect.set()</code></li>
+     * </ul>
+     *
+     * <h2>Инварианты</h2>
+     * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
+     * <code>{@link Proxy}</code> после выполнения метода возбудит исключение <code>{@link TypeError}</code>:
+     * <ul>
+     *     <li>Cannot change the value of a property to be different from the value of the corresponding target object property if the corresponding target object property is a non-writable, non-configurable data property.</li>
+     *     <li>Cannot set the value of a property if the corresponding target object property is a non-configurable accessor property that has undefined as its [[Set]] attribute.</li>
+     *     <li>In strict mode, a false return value from the set handler will throw a TypeError exception.</li>
+     * </ul>
+     *
+     * @example
+     * // The following code traps setting a property value.
+     * var p = new Proxy({}, {
+     *     set: function(target, prop, value, receiver) { console.log("called: " + prop + " = " + value); return true; }
+     * });
+     * p.a = 10; // "called: a = 10"
+     *
+     * @param {T} target целевой объект
+     * @param {string} property имя свойства для установки в него знаения
+     * @param {*} value устанавливаемое в свойство новое значение
+     * @param {*} receiver The object to which the assignment was originally directed. This is usually the proxy itself. But a set handler can also be called indirectly, via the prototype chain or various other ways.
+     * For example, suppose a script does obj.name = "jen", and obj is not a proxy, and has no own property .name, but it has a proxy on its prototype chain. That proxy's set handler will be called, and obj will be passed as the receiver.
+     *
+     * @returns {boolean} Return true to indicate that assignment succeeded. If the set method returns false, and the assignment happened in strict-mode code, a TypeError will be thrown.
+     *
+     * @see Proxy
+     * @see Reflect#set
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Set]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver}
+     */
+    set(target, property, value, receiver) {}
 
     deleteProperty() {}
 
