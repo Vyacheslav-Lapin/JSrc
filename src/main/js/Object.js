@@ -32,7 +32,8 @@
  * @see Function#prototype
  * @see Number
  * @see String
- * @since Standard ECMA-262 1st. Edition
+ * @since Standard ECMA-262 1st. Edition - Первоначальное описание. Реализовано в JavaScript 1.0:
+ * {@link http://www.ecma-international.org/publications/files/ECMA-ST-ARCH/ECMA-262,%201st%20edition,%20June%201997.pdf}
  */
 const Object = ((PROTOTYPE, EXTENSIBLE) => {
 
@@ -87,7 +88,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @returns {C} Получившийся целевой объект
      * @throws TypeError если параметр <em>target</em> не определён (<code>undefined</code> или равен <code>null</code>)
      *
-     * @since Standard ECMA-262 6th. Edition (ECMAScript 2015)
+     * @since Standard ECMA-262 6th. Edition (ECMAScript 2015) - Описание 'Object.assign':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-object.assign}
      */
     Object.assign = (target, ...sources) => {
         if (typeof target === 'undefined' || target === null)
@@ -177,9 +179,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      *
      * @template T, V
      * @param {T} object Объект, в котором будут создаваться или настраиваться свойства.
-     * @param {*<FieldDescriptor<V>|PropertyDescriptor<V>>?} descriptors
-     *  Объект, отображающий имена свойств и их дескрипторы.
-     *
+     * @param {*<FieldDescriptor<V>|PropertyDescriptor<V>>?} descriptors Объект, отображающий имена свойств на их
+     * дескрипторы.
      * @return {T} Объект <em>object</em>.
      *
      * @throws {TypeError} Генерируется, если аргумент <em>object</em> не является объектом или если какое-либо из
@@ -403,7 +404,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @param value2 Второе сравниваемое значение.
      * @returns {boolean}
      *
-     * @since Standard ECMA-262 6th. Edition
+     * @since Standard ECMA-262 6th. Edition (ECMAScript 2015) - Описание 'Object.is':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-object.is}
      */
     Object.is = (value1, value2) => {
         return (value1 === 0 && value2 === 0) ? 1 / value1 === 1 / value2 :
@@ -943,7 +945,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      */
     Object.prototype.valueOf = () => {
         return this;
-    }
+    };
 
     return Object;
+
 })(Symbol('prototype'), Symbol('extensible'));

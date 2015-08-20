@@ -316,7 +316,12 @@ class ProxyHandler {
      *
      * @param {T} target целевой объект
      * @param {string} propertyName имя свойства, значение которого пытаются получить
-     * @param {*} receiver либо proxy, либо объект-наследник от proxy
+     * @param {*} receiver Объект, каоторому данный вызов изначально адресован. Обычно это - данный proxy и есть, но
+     * множество <code>ProxyHandler</code>`ов могут так же быть вызваны опосредованно, по цепи прототипов или
+     * какими-либо иными способами. Например, предположим, что сценарий делает следующее: <code>obj.name</code>, и
+     * <code>obj</code> - это не proxy, и он так же не имеет собственного свойства <code>.name</code>, но в его цепи
+     * прототипов есть proxy. Метод <code>get ProxyHandler</code>`а этого proxy будет вызван, и <code>obj</code> будет
+     * передан, как параметр <em>receiver</em>.
      *
      * @see Proxy
      * @see Reflect#get
@@ -338,13 +343,18 @@ class ProxyHandler {
      * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
      * <code>{@link Proxy}</code> после выполнения метода возбудит исключение <code>{@link TypeError}</code>:
      * <ul>
-     *     <li>Cannot change the value of a property to be different from the value of the corresponding target object property if the corresponding target object property is a non-writable, non-configurable data property.</li>
-     *     <li>Cannot set the value of a property if the corresponding target object property is a non-configurable accessor property that has undefined as its [[Set]] attribute.</li>
-     *     <li>In strict mode, a false return value from the set handler will throw a TypeError exception.</li>
+     *     <li>Запрещается менять значение свойства так, что бы оно отличалось от значения соответствующего
+     *     свойства целевого объекта в случае, если оно незаписываемое (non-writable) и неконфигурируемое
+     *     (non-configurable).</li>
+     *     <li>Запрещается менять значение свойства, если значение соответствующего свойства целевого объекта
+     *     неконфигурируемое (non-configurable) get/set-свойство, возвращающее <code>undefined</code> в качестве своего
+     *     <code>[[Set]]</code> атрибута.</li>
+     *     <li>В строгом режиме (strict mode), возврат значения <code>false</code> из метода возбуждает исключение
+     *     <code>{@link TypeError}</code>.</li>
      * </ul>
      *
      * @example
-     * // The following code traps setting a property value.
+     * // Следующий код перехватывает установку значения свойства:
      * var p = new Proxy({}, {
      *     set: function(target, prop, value, receiver) { console.log("called: " + prop + " = " + value); return true; }
      * });
@@ -353,10 +363,16 @@ class ProxyHandler {
      * @param {T} target целевой объект
      * @param {string} property имя свойства для установки в него знаения
      * @param {*} value устанавливаемое в свойство новое значение
-     * @param {*} receiver The object to which the assignment was originally directed. This is usually the proxy itself. But a set handler can also be called indirectly, via the prototype chain or various other ways.
-     * For example, suppose a script does obj.name = "jen", and obj is not a proxy, and has no own property .name, but it has a proxy on its prototype chain. That proxy's set handler will be called, and obj will be passed as the receiver.
+     * @param {*} receiver Объект, каоторому данный вызов изначально адресован. Обычно это - данный proxy и есть, но
+     * множество <code>ProxyHandler</code>`ов могут так же быть вызваны опосредованно, по цепи прототипов или
+     * какими-либо иными способами. Например, предположим, что сценарий делает следующее: <code>obj.name = "jen"</code>,
+     * и <code>obj</code> - это не proxy, и он так же не имеет собственного свойства <code>.name</code>, но в его цепи
+     * прототипов есть proxy. Метод <code>set ProxyHandler</code>`а этого proxy будет вызван, и <code>obj</code> будет
+     * передан, как параметр <em>receiver</em>.
      *
-     * @returns {boolean} Return true to indicate that assignment succeeded. If the set method returns false, and the assignment happened in strict-mode code, a TypeError will be thrown.
+     * @returns {boolean} <code>true</code> для того, что бы показать, что назначение нового значения произошло успешно.
+     * Если метод <code>set</code> вернёт <code>false</code>, и присвоение производится в строгом режиме (strict-mode),
+     * будет возбуждено исключение <code>{@link TypeError}</code>.
      *
      * @see Proxy
      * @see Reflect#set
@@ -364,6 +380,7 @@ class ProxyHandler {
      * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-set-p-v-receiver}
      */
     set(target, property, value, receiver) {}
+
 
     deleteProperty() {}
 
