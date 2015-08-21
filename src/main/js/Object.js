@@ -315,9 +315,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#keys
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.getOwnPropertyNames = object => {
-        return Object.keys(object).concat(/*proxied code*/);
-    };
+    Object.getOwnPropertyNames = object => Object.keys(object).concat(/*proxied code*/);
 
     /**
      * Метод <code>Object.getOwnPropertySymbols()</code> возвращает массив всех символических (symbol) свойств,
@@ -356,9 +354,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Function#prototype
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.getPrototypeOf = object => {
-        return this[PROTOTYPE];
-    };
+    Object.getPrototypeOf = object => this[PROTOTYPE];
 
     /**
      * Метод <code>Object.is()</code> определяет, являются ли два значения <a
@@ -407,10 +403,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @since Standard ECMA-262 6th. Edition (ECMAScript 2015) - Описание 'Object.is':
      * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-object.is}
      */
-    Object.is = (value1, value2) => {
-        return (value1 === 0 && value2 === 0) ? 1 / value1 === 1 / value2 :
+    Object.is = (value1, value2) => (value1 === 0 && value2 === 0) ? 1 / value1 === 1 / value2 :
             (value1 !== value1) ? value2 !== value2 : value1 === value2;
-    };
 
     /**
      * Возможно ли добавить в объект новое свойство? Если в объект можно добавлять новые свойства, он является
@@ -433,9 +427,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#preventExtensions
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.isExtensible = object => {
-        return object[EXTENSIBLE];
-    };
+    Object.isExtensible = object => object[EXTENSIBLE];
 
     /**
      * Является ли объект неизменяемым? Объект считается зафиксированным, если все его неунаследованные свойства (кроме
@@ -462,10 +454,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      *
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.isFrozen = object => {
-        return Object.isExtensible(object) && Object.getOwnPropertyNames(object).every(
+    Object.isFrozen = object => Object.isExtensible(object) && Object.getOwnPropertyNames(object).every(
                 propertyName => Object.getOwnPropertyDescriptor(object, propertyName).writable);
-    };
 
     /**
      * Возможно ли добавлять в объект новые и удалять существующие свойства? Объект считается нерасширяемым, с
@@ -489,10 +479,8 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#seal
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.isSealed = object => {
-        return Object.isExtensible(object) && object.getOwnPropertyNames().some(
+    Object.isSealed = object => Object.isExtensible(object) && object.getOwnPropertyNames().some(
                     propertyName => Object.getOwnPropertyDescriptor(object, propertyName).configurable);
-    };
 
     /**
      * Возвращает имена собственных перечислимых свойств. Функция <code>{@link Object#keys}()</code> возвращает массив с
@@ -539,14 +527,14 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      *
      * @example
      * // Журналирование всех трёх типов изменений
-     * var obj = {foo: 0, bar: 1};
+     * const obj = {foo: 0, bar: 1};
      * Object.observe(obj, function(changes) {console.log(changes);});
      * obj.baz = 2; // [{name: 'baz', object: <obj>, type: 'add'}]
      * obj.foo = 'hello'; // [{name: 'foo', object: <obj>, type: 'update', oldValue: 0}]
      * delete obj.baz; // [{name: 'baz', object: <obj>, type: 'delete', oldValue: 2}]
      *
      * // Привязка данных - Пользовательская модель
-     * var user = { id: 0, name: 'Брендан Айк', title: 'М-р.'};
+     * const user = { id: 0, name: 'Брендан Айк', title: 'М-р.'};
      *
      * // Создаёт приветствие для пользователя
      * function updateGreeting() {
@@ -554,13 +542,11 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * }
      * updateGreeting();
      *
-     * Object.observe(user, function(changes) {
-     *  changes.forEach(change => {
+     * Object.observe(user, changes => changes.forEach(change => {
      *      // Любое изменение имени или обращения обновит привествие
      *      if (change.name === 'name' || change.name === 'title')
      *          updateGreeting();
-     *  });
-     * });
+     * }));
      *
      * @see Object#unobserve
      * @see Array#observe
@@ -617,9 +603,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#hasOwnProperty
      * @since Standard ECMA-262 5th. Edition (ECMAScript 5)
      */
-    Object.propertyIsEnumerable = propertyName => {
-        return Object.getOwnPropertyDescriptor(this, propertyName).enumerable;
-    };
+    Object.propertyIsEnumerable = propertyName => Object.getOwnPropertyDescriptor(this, propertyName).enumerable;
 
     /**
      * Предотвращает добавление и удаление свойств. Функция <code>Object.seal()</code> делает объект <em>object</em>
@@ -806,9 +790,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#constructor
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    Object.prototype.isPrototypeOf = object => {
-        return this === Object.getPrototypeOf(object);
-    };
+    Object.prototype.isPrototypeOf = object => this === Object.getPrototypeOf(object);
 
     /**
      * Возвращает локализованное строковое представление объекта. Этот метод предназначен для получения строкового
@@ -827,9 +809,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#toString
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    Object.prototype.toLocaleString = () => {
-        return this.toString();
-    };
+    Object.prototype.toLocaleString = () => this.toString();
 
     /**
      * Возвращает строковое представление объекта. Метод <code>toString()</code> относится к тем, которые обычно не
@@ -895,9 +875,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#valueOf
      * @since Standard ECMA-262 1st. Edition
      */
-    Object.prototype.toString = () => {
-        return '[object Object]';
-    };
+    Object.prototype.toString = () => '[object Object]';
 
     /**
      * Элементарное значение указанного объекта. Элементарное значение, связанное с объектом, если оно есть. Если с
@@ -943,9 +921,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#toString
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    Object.prototype.valueOf = () => {
-        return this;
-    };
+    Object.prototype.valueOf = () => this;
 
     return Object;
 
