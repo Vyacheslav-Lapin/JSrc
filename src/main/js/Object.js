@@ -18,7 +18,7 @@
  *
  * @class
  *
- * @param {number|boolean|string|symbol?} value В этом необязательном аргументе указано элементарное
+ * @param {number|boolean|string|symbol} value В этом необязательном аргументе указано элементарное
  * JavaScript-значение – число, логическое значение или строка, которое должно быть преобразовано в объект
  * <code>Number</code>, <code>Boolean</code> или <code>String</code>.
  *
@@ -37,7 +37,7 @@
  */
 const Object = ((PROTOTYPE, EXTENSIBLE) => {
 
-    function Object(value = undefined) {
+    const Object = value => {
 
         if (!(this instanceof Object)) // if Object was called without "new" keyword
             return new Object(value);
@@ -54,7 +54,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
         }
 
         Object.setPrototypeOf(this, this.constructor.prototype);
-    }
+    };
 
     /**
      * Метод <code>Object.assign()</code> используется для копирования значений всех собственных перечислимых свойств из
@@ -413,7 +413,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * <code>{@link Object#seal}()</code> или <code>{@link Object#freeze}()</code>.
      *
      * @example
-     * var o = {}; // Создать новый объект
+     * const o = {}; // Создать новый объект
      * Object.isExtensible(o) // => true: он является расширяемым
      * Object.preventExtensions(o); // Сделать нерасширяемым
      * Object.isExtensible(o) // => false: теперь он нерасширяемый

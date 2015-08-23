@@ -9,7 +9,6 @@
  */
 class FieldDescriptor extends Descriptor {
     constructor(){
-        super();
         /** @type T       */ this.value = {};
         /** @type boolean */ this.writable = false;
     }

@@ -7,19 +7,18 @@
 class ProxyHandler {
 
     /**
-     * Метод <code>ProxyHandler.getPrototypeOf()</code> является ловушкой для внутреннего метода
-     * <code>[[GetPrototypeOf]]</code>. Т.е. данный метод-ловушка может перехватывать следующие вызовы и операции:
+     * Метод <code>ProxyHandler.getPrototypeOf()</code> пеехватывает вызов внутреннего метода
+     * <code>[[GetPrototypeOf]]</code>, т.е. следующие вызовы и операции:
      * <code class="javascript"><ul>
      *     <li>{@link Object#getPrototypeOf}()</li>
      *     <li>{@link Reflect#getPrototypeOf}()</li>
-     *     <li>{@link Object#__proto__}</li>
      *     <li>{@link Object#isPrototypeOf}()</li>
      *     <li>instanceof</li>
      * </ul></code>
      *
      * <h2>Инварианты</h2>
      * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
-     * <code>{@link Proxy}</code> после выполнения метода возбудит исключение <code>{@link TypeError}</code>:
+     * <code>{@link Proxy}</code> после его выполнения возбудит исключение <code>{@link TypeError}</code>:
      * <ul>
      *     <li>Метод <code>getPrototypeOf</code> должен возвращать объект или <code>null</code>.</li>
      *     <li>Если целевой объект не расширяем (not extensible), <code>{@link Object#getPrototypeOf}(proxy)</code>
@@ -283,13 +282,13 @@ class ProxyHandler {
     has(target, propertyName) {}
 
     /**
-     * Метод <code>ProxyHandler.get()</code> является перехватчиком для операции получения значения свойства
-     * (<code>[[Get]]</code>). Т.е. данный метод может перехватывать следующие вызовы и операции:
+     * Метод <code>ProxyHandler.get()</code> является перехватчиком для внутренней операции <code>[[Get]]</code>, т.е.
+     * следующих вызовов и операций:
      * <ul>
-     *     <li>Доступ к свойству: <code>proxy[foo]</code> и <code>proxy.bar</code></li>
-     *     <li>Доступ к унаследованному свойству: <code>{@link Object#create}(proxy)[foo]</code></li>
-     *     <li>Проверка <code>with</code>: <code>with(proxy) { (foo); }</code></li>
-     *     <li><code>{@link Reflect#get}()</code></li>
+     *     <li>доступа к свойству: <code>proxy[foo]</code> и <code>proxy.bar</code></li>
+     *     <li>доступа к унаследованному свойству: <code>{@link Object#create}(proxy)[foo]</code></li>
+     *     <li>проверки <code>with</code>: <code>with(proxy) { (foo); }</code></li>
+     *     <li>вызова <code>{@link Reflect#get}()</code></li>
      * </ul>
      *
      * <h2>Инварианты</h2>
@@ -323,6 +322,8 @@ class ProxyHandler {
      * прототипов есть proxy. Метод <code>get ProxyHandler</code>`а этого proxy будет вызван, и <code>obj</code> будет
      * передан, как параметр <em>receiver</em>.
      *
+     * @returns {?} значение свойства целевого объекта
+     *
      * @see Proxy
      * @see Reflect#get
      * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Get]]':
@@ -355,7 +356,7 @@ class ProxyHandler {
      *
      * @example
      * // Следующий код перехватывает установку значения свойства:
-     * var p = new Proxy({}, {
+     * const p = new Proxy({}, {
      *     set: function(target, prop, value, receiver) { console.log("called: " + prop + " = " + value); return true; }
      * });
      * p.a = 10; // "called: a = 10"
@@ -381,12 +382,120 @@ class ProxyHandler {
      */
     set(target, property, value, receiver) {}
 
+    /**
+     * Метод <code>{@link ProxyHandler.deleteProperty}()</code> перехватывает вызов оператора <code>delete</code>. Т.е.
+     * данный метод может перехватывать следующие вызовы и операции:
+     * <ul>
+     *     <li>Удаление свойства: <code>delete proxy[foo]</code> и <code>delete proxy.foo</code></li>
+     *     <li><code>{@link Reflect#deleteProperty}()</code></li>
+     * </ul>
+     *
+     * <h2>Инвариант</h2>
+     * Свойство не может быть удалено, если оно существует как неконфигурируемое (non-configurable) собственное свойство
+     * целевого объекта. Если метод сигнализирует об обратном, класс <code>{@link Proxy}</code> после его выполнения
+     * возбудит исключение <code>{@link TypeError}</code>.
+     *
+     * @example
+     * // Следующий код перехватывает оператор delete:
+     * const p = new Proxy({}, {
+     *     deleteProperty: function(target, prop) { console.log("called: " + prop); return true; }
+     * });
+     * delete p.a; // "called: a"
+     *
+     * @param {T} target цеевой объект
+     * @param {string} propertyName имя свойства, которое необходимо удалить
+     * @returns {boolean} удалось ли удалить свойство?
+     *
+     * @see Proxy
+     * @see Reflect#deleteProperty
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Delete]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-delete-p}
+     */
+    deleteProperty(target, propertyName) {}
 
-    deleteProperty() {}
+    /**
+     * Метод <code>{@link ProxyHandler.enumerate}()</code> перехватывает вызов оператора <code>for..in</code>, т.е.
+     * следующие вызовы и операции:
+     * <ul>
+     *     <li>Перечисление свойств объекта прокси / <code>for...in</code>:
+     *     <code>for (var name in proxy) {...}</code></li>
+     *     <li><code>{@link Reflect#enumerate}()</code></li>
+     * </ul>
+     *
+     * <h2>Инвариант</h2>
+     * Метод перечисления должен возвращать объект, иначе класс <code>{@link Proxy}</code> после его выполнения возбудит
+     * исключение <code>{@link TypeError}</code>.
+     *
+     * @example
+     * // Следующий код перехватывает оператор "for...in":
+     * const p = new Proxy({}, {
+     *     enumerate(target) { console.log("called"); return ["a", "b", "c"][Symbol.iterator](); }
+     * });
+     * for (let x in p) // "called"
+     *     console.log(x);  // "a", "b", "c"
+     *
+     * // Следующий код нарушает инвариант.
+     * const p = new Proxy({}, { enumerate(target) { return 1; } });
+     * for (var x in p) {} // Возбуждается TypeError
+     *
+     * @param {T} target целевой объект
+     * @return {Iterator<string|symbol>} перечисление имён свойств для возможности их перебора
+     *
+     * @see Proxy
+     * @see Reflect#enumerate
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Enumerate]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-enumerate}
+     */
+    enumerate(target) {}
 
-    enumerate() {}
+    /**
+     * Метод <code>ProxyHandler.ownKeys()</code> отлавливает вызов внутреннего метода <code>[[OwnPropertyKeys]]</code>,
+     * т.е. данный метод перехватывает вызовы следующих методов:
+     * <code><ul>
+     *     <li>{@link Object#getOwnPropertyNames}()</li>
+     *     <li>{@link Object#getOwnPropertySymbols}()</li>
+     *     <li>{@link Object#keys}()</li>
+     *     <li>{@link Reflect#ownKeys}()</li>
+     * </ul></code>
+     *
+     * <h2>Инварианты</h2>
+     * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
+     * <code>{@link Proxy}</code> после выполнения метода возбудит исключение <code>{@link TypeError}</code>:
+     * <ul>
+     *     <li>Возвращаемый результат метода <code>ownKeys</code> должен быть массивом.</li>
+     *     <li>Тип каждого элемента массива должен быть либо <code>{@link String}</code>, либо
+     *     <code>{@link Symbol}</code>.</li>
+     *     <li>Результирующий список должен содержать ключи всех неконфигурируемых (non-configurable) собственных
+     *     свойств целевого объекта.</li>
+     *     <li>Если целевой объект нерасширяем (not extensible), результирующий список должен содержать все ключи
+     *     собственных свойств целевого объекта и не содержать других значений.</li>
+     * </ul>
+     *
+     * @example
+     * // Следуюий код перехватывает вызов Object.getOwnPropertyNames()
+     * const p = new Proxy({}, { ownKeys: function(target) { console.log("called"); return ["a", "b", "c"]; } });
+     * console.log(Object.getOwnPropertyNames(p)); // "called"
+     *
+     * // Следующий вызов нарушает инвариант:
+     * const obj = {};
+     * Object.defineProperty(obj, "a", { configurable: false, enumerable: true, value: 10 });
+     * const p = new Proxy(obj, {
+     *     ownKeys: function(target) { return [123, 12.5, true, false, undefined, null, {}, []]; }
+     * });
+     * console.log(Object.getOwnPropertyNames(p)); // Возбуждается TypeError: метод-перехватчик [[OwnPropertyKeys]]
+     * // должен возвращать перечисление элементов, состоящих только из строк и символов
+     *
+     * @param {T} target целевой объект
+     * @returns {Array<string|symbol>} перечислимый объект для перебора имён свойств (т.е. строк и символов)
+     *
+     * @see Proxy
+     * @see Object#getOwnPropertyNames
+     * @see Reflect#ownKeys
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[OwnPropertyKeys]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys}
+     */
+    ownKeys(target) {}
 
-    ownKeys() {}
 
     apply() {}
 
