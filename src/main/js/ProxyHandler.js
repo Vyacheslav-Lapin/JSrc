@@ -7,8 +7,8 @@
 class ProxyHandler {
 
     /**
-     * Метод <code>ProxyHandler.getPrototypeOf()</code> пеехватывает вызов внутреннего метода
-     * <code>[[GetPrototypeOf]]</code>, т.е. следующие вызовы и операции:
+     * Метод <code>ProxyHandler.getPrototypeOf()</code> ловит вызов внутреннего метода <code>[[GetPrototypeOf]]</code>,
+     * т.е. перехватывает вызовы следующих методов и операций:
      * <code class="javascript"><ul>
      *     <li>{@link Object#getPrototypeOf}()</li>
      *     <li>{@link Reflect#getPrototypeOf}()</li>
@@ -66,9 +66,9 @@ class ProxyHandler {
     getPrototypeOf(target) {}
 
     /**
-     * Метод <code>ProxyHandler.setPrototypeOf()</code> является ловушкой для вызова метода
-     * <code>[[SetPrototypeOf]]</code>. Как следствие, осуществляется перехват вызовов
-     * <code>{@link Object#setPrototypeOf}()</code> и <code>{@link Reflect#setPrototypeOf}()</code>.
+     * Метод <code>ProxyHandler.setPrototypeOf()</code> ловит вызов dyenhtyytuj метода <code>[[SetPrototypeOf]]</code>,
+     * т.е. перехватывает вызов <code>{@link Object#setPrototypeOf}()</code> и
+     * <code>{@link Reflect#setPrototypeOf}()</code>.
      *
      * <h2>Инвариант</h2>
      * Если <em>target</em> является не расширяемым (not extensible), параметр <em>prototype</em> должен быть тем же
@@ -87,9 +87,8 @@ class ProxyHandler {
     setPrototypeOf(target, prototype) {}
 
     /**
-     * Метод <code>ProxyHandler.isExtensible()</code> является ловушкой для вызова <code>[[IsExtensible]]</code>. Как
-     * следствие, осуществляется перехват вызовов <code>{@link Object#isExtensible}()</code> и
-     * <code>{@link Reflect#isExtensible}()</code>.
+     * Метод <code>ProxyHandler.isExtensible()</code> ловит вызов внутреннего метода <code>[[IsExtensible]]</code>, т.е.
+     * перехватывает вызововы <code>{@link Object#isExtensible}()</code> и <code>{@link Reflect#isExtensible}()</code>.
      *
      * <h2>Инвариант</h2>
      * Метод <code>{@link Object#isExtensible}(proxy)</code> должен возвращать то же значение, что и
@@ -117,9 +116,9 @@ class ProxyHandler {
     isExtensible(target) {}
 
     /**
-     * Метод <code>ProxyHandler.preventExtensions()</code> является ловушкой для вызова
-     * <code>[[PreventExtensions]]</code>. Как следствие, осуществляется перехват вызовов
-     * <code>{@link Object#preventExtensions}()</code> и <code>{@link Reflect#preventExtensions}()</code>.
+     * Метод <code>ProxyHandler.preventExtensions()</code> ловит каждый вызов <code>[[PreventExtensions]]</code>, т.е.
+     * перехватывает вызовы <code>{@link Object#preventExtensions}()</code> и
+     * <code>{@link Reflect#preventExtensions}()</code>.
      *
      * <h2>Инвариант</h2>
      * Метод <code>{@link Object#preventExtensions}(proxy)</code> должен возвращать <code>true</code> только если
@@ -149,8 +148,8 @@ class ProxyHandler {
     preventExtensions(target) {}
 
     /**
-     * Метод <code>ProxyHandler.getOwnPropertyDescriptor</code> является ловушкой для вызова внутреннего метода
-     * <code>[[GetOwnProperty]]</code>. Как следствие, им осуществляется перехват вызовов
+     * Метод <code>ProxyHandler.getOwnPropertyDescriptor</code> ловит вызов внутреннего метода
+     * <code>[[GetOwnProperty]]</code>, т.е. перехватывает вызовов
      * <code>{@link Object#getOwnPropertyDescriptor}()</code> и <code>{@link Reflect#getOwnPropertyDescriptor}()</code>.
      *
      * <h2>Инварианты</h2>
@@ -199,9 +198,9 @@ class ProxyHandler {
     getOwnPropertyDescriptor(target, propertyName) {}
 
     /**
-     * Метод <code>ProxyHandler.defineProperty</code> является ловушкой для вызова внутреннего метода
-     * <code>[[DefineOwnProperty]]</code>. Как следствие, им осуществляется перехват вызовов
-     * <code>{@link Object#defineProperty}()</code> и <code>{@link Reflect#defineProperty}()</code>.
+     * Метод <code>ProxyHandler.defineProperty</code> ловит вызов внутреннего метода <code>[[DefineOwnProperty]]</code>,
+     * т.е. им осуществляется перехват вызовов методов <code>{@link Object#defineProperty}()</code> и
+     * <code>{@link Reflect#defineProperty}()</code>.
      *
      * <h2>Инварианты</h2>
      * Если какой-либо из нижеперечисленных инвариантов не выполняется в отношении реализации данного метода, класс
@@ -241,8 +240,8 @@ class ProxyHandler {
     defineProperty(target, propertyName, descriptor) {}
 
     /**
-     * Метод <code>ProxyHandler.has()</code> является ловушкой для внутреннего метода
-     * <code>[[HasProperty]]</code>. Т.е. данный метод-ловушка может перехватывать следующие вызовы и операции:
+     * Метод <code>ProxyHandler.has()</code> ловит вызов внутреннего метода <code>[[HasProperty]]</code>, т.е.
+     * перехватывает вызовы следующих методов и операций:
      * <ul>
      *     <li>Property query: <code>foo in proxy</code></li>
      *     <li>Inherited property query: <code>foo in {@link Object#create}(proxy)</code></li>
@@ -282,8 +281,8 @@ class ProxyHandler {
     has(target, propertyName) {}
 
     /**
-     * Метод <code>ProxyHandler.get()</code> является перехватчиком для внутренней операции <code>[[Get]]</code>, т.е.
-     * следующих вызовов и операций:
+     * Метод <code>ProxyHandler.get()</code> ловит вызов внутренней операции <code>[[Get]]</code>, т.е.
+     * вызовы следующих методов и операций:
      * <ul>
      *     <li>доступа к свойству: <code>proxy[foo]</code> и <code>proxy.bar</code></li>
      *     <li>доступа к унаследованному свойству: <code>{@link Object#create}(proxy)[foo]</code></li>
@@ -332,8 +331,8 @@ class ProxyHandler {
     get(target, propertyName, receiver) {}
 
     /**
-     * Метод <code>ProxyHandler.set()</code> отлавливает установку значения свойства (<code>[[Set]]</code>).  Т.е.
-     * данный метод может перехватывать следующие вызовы и операции:
+     * Метод <code>ProxyHandler.set()</code> отлавливает вызов внутреннего метода <code>[[Set]]</code>), т.е.
+     * перехватывает вызовы следующих методов и операций:
      * <ul>
      *     <li>Присвоение значения свойству: <code>proxy[foo] = bar and proxy.foo = bar</code></li>
      *     <li>Присвоение значения унаследованному свойству: <code>Object.create(proxy)[foo] = bar</code></li>
@@ -383,8 +382,8 @@ class ProxyHandler {
     set(target, property, value, receiver) {}
 
     /**
-     * Метод <code>{@link ProxyHandler.deleteProperty}()</code> перехватывает вызов оператора <code>delete</code>. Т.е.
-     * данный метод может перехватывать следующие вызовы и операции:
+     * Метод <code>{@link ProxyHandler.deleteProperty}()</code> ловит вызов оператора <code>delete</code>, т.е.
+     * перехватывает вызовы следующих методов и операций:
      * <ul>
      *     <li>Удаление свойства: <code>delete proxy[foo]</code> и <code>delete proxy.foo</code></li>
      *     <li><code>{@link Reflect#deleteProperty}()</code></li>
@@ -414,8 +413,8 @@ class ProxyHandler {
     deleteProperty(target, propertyName) {}
 
     /**
-     * Метод <code>{@link ProxyHandler.enumerate}()</code> перехватывает вызов оператора <code>for..in</code>, т.е.
-     * следующие вызовы и операции:
+     * Метод <code>{@link ProxyHandler.enumerate}()</code> ловит вызов оператора <code>for..in</code>, т.е.
+     * перехватывает вызовы следующих методов и операций:
      * <ul>
      *     <li>Перечисление свойств объекта прокси / <code>for...in</code>:
      *     <code>for (var name in proxy) {...}</code></li>
@@ -449,8 +448,8 @@ class ProxyHandler {
     enumerate(target) {}
 
     /**
-     * Метод <code>ProxyHandler.ownKeys()</code> отлавливает вызов внутреннего метода <code>[[OwnPropertyKeys]]</code>,
-     * т.е. данный метод перехватывает вызовы следующих методов:
+     * Метод <code>ProxyHandler.ownKeys()</code> ловит вызов внутреннего метода <code>[[OwnPropertyKeys]]</code>,
+     * т.е. перехватывает вызовы следующих методов:
      * <code><ul>
      *     <li>{@link Object#getOwnPropertyNames}()</li>
      *     <li>{@link Object#getOwnPropertySymbols}()</li>
@@ -473,15 +472,13 @@ class ProxyHandler {
      *
      * @example
      * // Следуюий код перехватывает вызов Object.getOwnPropertyNames()
-     * const p = new Proxy({}, { ownKeys: function(target) { console.log("called"); return ["a", "b", "c"]; } });
+     * const p = new Proxy({}, { ownKeys(target) { console.log("called"); return ["a", "b", "c"]; } });
      * console.log(Object.getOwnPropertyNames(p)); // "called"
      *
      * // Следующий вызов нарушает инвариант:
      * const obj = {};
      * Object.defineProperty(obj, "a", { configurable: false, enumerable: true, value: 10 });
-     * const p = new Proxy(obj, {
-     *     ownKeys: function(target) { return [123, 12.5, true, false, undefined, null, {}, []]; }
-     * });
+     * const p = new Proxy(obj, { ownKeys(target) { return [123, 12.5, true, false, undefined, null, {}, []]; } });
      * console.log(Object.getOwnPropertyNames(p)); // Возбуждается TypeError: метод-перехватчик [[OwnPropertyKeys]]
      * // должен возвращать перечисление элементов, состоящих только из строк и символов
      *
@@ -496,8 +493,69 @@ class ProxyHandler {
      */
     ownKeys(target) {}
 
+    /**
+     * Метод <code>ProxyHandler.apply()</code> ловит вызов внутреннего метода <code>[[Call]]</code>, т.е. перехватывает
+     * вызовы следующих методов и операторов:
+     * <ul>
+     *     <li><code>proxy(..args)</code></li>
+     *     <li><code>{@link Function#apply}()</code> и <code>{@link Function#call}()</code></li>
+     *     <li><code>{@link Reflect#apply}()</code></li>
+     * </ul>
+     *
+     * @example
+     * // Следующий код ловит вызов функции:
+     * const p = new Proxy(()=>{}, {
+     *     apply(target, thisArg, args) {
+     *         console.log("called: " + args.join(", "));
+     *         return args[0] + args[1] + args[2]; }});
+     * console.log(p(1, 2, 3)); // "called: 1, 2, 3", 6
+     *
+     * @param {T} target целевой объект
+     * @param {*} thisArg аргумент, доступный при вызове по ссылке <code>this</code>
+     * @param {...?} args аргументы вызова метода
+     * @returns {?} любое значение
+     *
+     * @see Proxy
+     * @see Function#apply
+     * @see Function#call
+     * @see Reflect#apply
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Call]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-proxy-object-internal-methods-and-internal-slots-call-thisargument-argumentslist}
+     */
+    apply(target, thisArg, ...args) {}
 
-    apply() {}
-
-    construct() {}
+    /**
+     * Метод <code>ProxyHandler.construct()</code> ловит вызов внутреннего метода <code>[[Construct]]</code>,
+     * т.е. перехватывает вызовы следующих методов и операторов:
+     * <code><ul>
+     *     <li>new proxy(...args)</li>
+     *     <li>{@link Reflect#construct}()</li>
+     * </ul></code>
+     *
+     * <h2>Инварианты</h2>
+     * Результат должен быть объектом, иначе класс <code>{@link Proxy}</code> после выполнения метода возбудит
+     * исключение <code>{@link TypeError}</code>.
+     *
+     * @example
+     * // Следуюий код перехватывает вызов оператора 'new':
+     * const p = new Proxy(()=>{}, {
+     *     construct(target, args) {
+     *         console.log("called: " + argumentsList.join(", "));
+     *         return { value: argumentsList[0] * 10 }; }});
+     * console.log(new p(1).value); // "called: 1", 10
+     *
+     * // Следующий код нарушает инвариант:
+     * const p = new Proxy(()=>{}, { construct(target, argumentsList) { return 1; } });
+     * new p(); // Возбуждается TypeError
+     *
+     * @param {T} target целевой объект
+     * @param {...?} args аргументы, передаваемые при вызове конструктору
+     * @returns {*}
+     *
+     * @see Proxy
+     * @see Reflect#construct
+     * @since Standard ECMAScript 2015 (ECMA-262, 6th Edition) - описание '[[Construct]]':
+     * {@link http://www.ecma-international.org/ecma-262/6.0/#sec-construct-internal-method}
+     */
+    construct(target, ...args) {}
 }
