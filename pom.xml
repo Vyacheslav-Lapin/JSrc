@@ -9,9 +9,9 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <spring.version>4.1.6.RELEASE</spring.version>
-        <junit.version>4.12</junit.version>
-        <slf4j-log4j12.version>1.7.10</slf4j-log4j12.version>
+        <spring.version>LATEST</spring.version>
+        <junit.version>LATEST</junit.version>
+        <slf4j-log4j12.version>LATEST</slf4j-log4j12.version>
     </properties>
 
     <dependencies>

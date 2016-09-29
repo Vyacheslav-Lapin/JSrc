@@ -8,7 +8,8 @@
  * @template T
  */
 class FieldDescriptor extends Descriptor {
-    constructor(){
+    constructor() {
+        super();
         /** @type T       */ this.value = {};
         /** @type boolean */ this.writable = false;
     }

@@ -2,7 +2,8 @@
  * @fileOverview Описание базового конструктора <code>Object</code>, вершины иерархии объектов JavaScript.
  * Текст комментариев в основном взят из книги
  * <a href="http://www.books.ru/books/javascript-podrobnoe-rukovodstvo-6-e-izdanie-fail-pdf-1826701/?show=1">"JavaScript
- * Подробное руководство" Дэвида Флэнагана, 6-е издание</a>, а так же (для ECMAScript 2015) перевод с сайта MDN.
+ * Подробное руководство" Дэвида Флэнагана, 6-е издание</a>, а так же (для ECMAScript 2015,2016,next) перевод статей с
+ * сайта MDN.
  *
  * @author <a href="http://vlapin.ru/">Vyacheslav Lapin</a>
  * @version 0.1 (09.04.2014 14:09)
@@ -19,8 +20,8 @@
  * @class
  *
  * @param {number|boolean|string|symbol} value В этом необязательном аргументе указано элементарное
- * JavaScript-значение – число, логическое значение или строка, которое должно быть преобразовано в объект
- * <code>Number</code>, <code>Boolean</code> или <code>String</code>.
+ * JavaScript-значение – число, логическое значение, строка или символ, которое должно быть преобразовано в объект
+ * <code>Number</code>, <code>Boolean</code>, <code>String</code> или <code>Symbol</code>.
  *
  * @return {*} Если передан аргумент <em>value</em>, конструктор возвращает вновь созданный экземпляр
  * <code>Object</code>. Если указан аргумент <em>value</em> элементарного типа, конструктор создает объект-обертку
@@ -32,8 +33,9 @@
  * @see Function#prototype
  * @see Number
  * @see String
- * @since Standard ECMA-262 1st. Edition - Первоначальное описание. Реализовано в JavaScript 1.0:
- * {@link http://www.ecma-international.org/publications/files/ECMA-ST-ARCH/ECMA-262,%201st%20edition,%20June%201997.pdf}
+ * @see Symbol
+ * @since Standard ECMA-262 1st. Edition - Первоначальное описание. Реализовано в [JavaScript
+ * 1.0]{@link http://www.ecma-international.org/publications/files/ECMA-ST-ARCH/ECMA-262,%201st%20edition,%20June%201997.pdf}
  */
 const Object = ((PROTOTYPE, EXTENSIBLE) => {
 
@@ -244,6 +246,51 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
         /* native code */
         return object;
     };
+
+    /**
+     * Метод <code>Object.entries()</code> возвращает массив собственных перечислимых (enumerable) пар свойств
+     * [ключ, значение] ([key, value]), в том же порядке, в котором они выдаются в рез-те цикла <code>for...in</code>
+     * (отличие в том, что цикл <code>for-in</code> перечисляет так же перечислимые св-ва bp цепочки прототипов).<br/>
+     * <code>Object.entries()</code> возвращает массив, элементы которого являются массивами, первые элементы которых
+     * ссылаются на перечислимые (enumerable) свойства объекта, а вторые - на занчения этих свойств у данного объекта
+     * ([ключ, значение]), принадлежащие прямо данному объекту. Порядок свойств остаётся тем же, что и при переборе
+     * свойств и их значений при помощи цикла <code>for..in</code>.<br/>
+     *
+     * <h2>Преобразование Object в Map</h2>
+     * Конструктор <code>new Map()</code> принимает перечисление сущностей. С Object.entries вы легко можете
+     * преобразовать <code>{@link Object}</code> в <code>{@link Map}</code>:
+     * var obj = { foo: "bar", baz: 42 };
+     * var map = new Map(Object.entries(obj));
+     * console.log(map); // Map { foo: "bar", baz: 42 }
+     *
+     * @example
+     * var obj = { foo: "bar", baz: 42 };
+     * console.log(Object.entries(obj)); // [ ['foo', 'bar'], ['baz', 42] ]
+     *
+     * // массив как объект
+     * var obj = { 0: 'a', 1: 'b', 2: 'c' };
+     * console.log(Object.entries(obj)); // [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
+     *
+     * // массив как объект c random сортировкой ключей
+     * var an_obj = { 100: 'a', 2: 'b', 7: 'c' };
+     * console.log(Object.entries(an_obj)); // [ ['2', 'b'], ['7', 'c'], ['100', 'a'] ]
+     *
+     * // getFoo is property which isn't enumerable
+     * var my_obj = Object.create({}, { getFoo: { value: function() { return this.foo; } } });
+     * my_obj.foo = "bar";
+     * console.log(Object.entries(my_obj)); // [ ['foo', 'bar'] ]
+     *
+     * // non-object argument will be coerced to an object
+     * console.log(Object.entries("foo")); // [ ['0', 'f'], ['1', 'o'], ['2', 'o'] ]
+     *
+     * @template T
+     * @param {*} object Объект, чьи перечислимые собственные свойства будут возвращены в виде массива [key, value] пар.
+     * @returns {Array<Array<T>>}
+     *
+     * @see https://tc39.github.io/ecma262/#sec-object.entries
+     * @since Standard ECMA-262 7th. Edition (ECMAScript 2017)
+     */
+    Object.entries = object => Object.keys(this).map(key => [key, this[key]]);
 
     /**
      * Делает объект неизменяемым. Функция <code>Object.freeze()</code> делает объект <em>object</em> нерасширяемым
@@ -809,7 +856,7 @@ const Object = ((PROTOTYPE, EXTENSIBLE) => {
      * @see Object#toString
      * @since Standard ECMA-262 3rd. Edition (ECMAScript 3)
      */
-    Object.prototype.toLocaleString = () => this.toString();
+    Object.prototype.toLocaleString = this.toString;
 
     /**
      * Возвращает строковое представление объекта. Метод <code>toString()</code> относится к тем, которые обычно не
