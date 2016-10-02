@@ -1,0 +1,6 @@
+/** @interface */
+class SVGFitToViewBox {
+    constructor(){
+
+    }
+}

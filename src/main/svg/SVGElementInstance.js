@@ -1,0 +1,8 @@
+/**
+ * @interface
+ */
+class SVGElementInstance {
+    constructor() {
+
+    }
+}

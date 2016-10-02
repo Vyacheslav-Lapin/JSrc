@@ -1,0 +1,8 @@
+/**
+ * @interface
+ */
+class SVGAnimatedString {
+    constructor() {
+
+    }
+}
